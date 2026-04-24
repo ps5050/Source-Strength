@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0A0A0B">
+<title>Source·Strength</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0A0A0B;--surf:#141416;--surf2:#1E1E22;--surf3:#28282E;
+  --acc:#D4FF4A;--acc2:#FF6B35;--text:#F0F0EC;--muted:#777;
+  --bdr:rgba(255,255,255,0.08);--green:#4AFF8C;--red:#FF4455;--blue:#60B8FF;
+}
+html,body{height:100%;overscroll-behavior:none}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+#app{max-width:480px;margin:0 auto;min-height:100vh}
+.screen{display:none;flex-direction:column;min-height:100vh;padding-bottom:48px}
+.screen.active{display:flex}
+
+/* ---- HOME ---- */
+.top-bar{padding:36px 20px 0;display:flex;align-items:flex-end;justify-content:space-between}
+.brand{font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;letter-spacing:-1px;line-height:1}
+.brand span{color:var(--acc)}
+.brand-sub{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.date-lbl{font-size:12px;color:var(--muted);text-align:right;line-height:1.7;font-family:'Barlow Condensed',sans-serif;font-weight:600}
+.home-actions{display:flex;flex-direction:column;gap:10px;padding:20px 20px 0}
+.home-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-primary{padding:24px 10px;background:var(--acc);border:none;border-radius:12px;font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#0A0A0B;cursor:pointer;transition:transform .1s,opacity .1s;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;line-height:1.2}
+.btn-primary:active{transform:scale(.97);opacity:.9}
+.btn-ghost{padding:18px 10px;background:var(--surf);border:1px solid var(--bdr);border-radius:12px;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text);cursor:pointer;transition:background .1s;text-align:center;line-height:1.3}
+.btn-ghost:active{background:var(--surf2)}
+.section-lbl{padding:26px 20px 10px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted)}
+.session-list{padding:0 20px;display:flex;flex-direction:column;gap:8px}
+.sess-card{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:background .1s}
+.sess-card:active{background:var(--surf2)}
+.sess-date{font-size:12px;color:var(--muted)}
+.sess-ex{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;margin-top:2px}
+.sess-wt{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--acc)}
+.empty{text-align:center;color:var(--muted);font-size:14px;padding:40px 0;line-height:2.2}
+
+/* ---- BACK ROW ---- */
+.back-row{padding:28px 20px 0;display:flex;align-items:center;gap:14px}
+.back-btn{width:42px;height:42px;background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-weight:700}
+.back-btn:active{opacity:.6}
+.back-title{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;line-height:1.1}
+.back-sub{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
+
+/* ---- WORKOUT ---- */
+.wkt-sections{padding:18px 20px;display:flex;flex-direction:column;gap:14px}
+.wkt-sec{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;overflow:hidden}
+.wkt-sec-head{padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.wkt-sec-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
+.wkt-sec-time{font-size:11px;color:var(--muted)}
+.sec-wu .wkt-sec-name{color:var(--blue)}
+.sec-pr .wkt-sec-name{color:var(--acc)}
+.sec-ac .wkt-sec-name{color:var(--acc2)}
+.mod-badge{margin:0 16px 10px;display:inline-block;background:var(--surf3);border:1px solid var(--bdr);border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--acc)}
+.mod-desc{padding:0 16px 14px;font-size:13px;color:var(--muted);line-height:1.6}
+.ex-row{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--bdr)}
+.ex-left{flex:1;cursor:pointer;padding-right:10px}
+.ex-name{font-family:'Barlow Condensed',sans-serif;font-size:21px;font-weight:700}
+.ex-done{font-size:10px;color:var(--green);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:3px}
+.ex-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.swap-btn{background:var(--surf3);border:1px solid var(--bdr);border-radius:6px;padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;letter-spacing:.5px;white-space:nowrap;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase}
+.swap-btn:active{opacity:.6}
+
+/* ---- LOG ---- */
+.log-outer{padding:26px 20px 0}
+.log-ex-name{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;line-height:1.1;margin-top:4px}
+.log-ex-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-top:6px}
+.last-banner{margin:14px 20px 0;background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.last-lbl{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px}
+.last-val{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--blue)}
+.last-date{font-size:11px;color:var(--muted)}
+.log-body{padding:18px 20px;display:flex;flex-direction:column;gap:18px}
+.ctrl-lbl{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.big-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.big-btn{padding:18px 8px;background:var(--surf);border:1px solid var(--bdr);border-radius:12px;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--text);text-align:center;cursor:pointer;transition:background .1s,border-color .1s;line-height:1.4;min-height:72px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.big-btn:active{transform:scale(.96)}
+.big-btn.sel{background:var(--surf3);border-color:var(--acc);color:var(--acc)}
+.big-btn.mid{background:var(--surf2);border-style:dashed;font-size:13px}
+.cur-display{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:16px;display:flex;align-items:center;justify-content:space-around}
+.disp-item{text-align:center}
+.disp-val{font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:900;line-height:1}
+.disp-unit{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.disp-div{width:1px;height:52px;background:var(--bdr)}
+.save-btn{width:100%;padding:22px;background:var(--acc);border:none;border-radius:12px;font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#0A0A0B;cursor:pointer;transition:transform .1s,opacity .1s}
+.save-btn:active{transform:scale(.97);opacity:.9}
+.sets-done{display:flex;flex-direction:column;gap:6px}
+.set-row{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center}
+.set-num{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:1px;text-transform:uppercase}
+.set-data{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700}
+
+/* ---- DATA ---- */
+.data-sec{padding:18px 20px;display:flex;flex-direction:column;gap:14px}
+.data-card{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:16px}
+.data-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.data-card-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700}
+.dl-btn{background:var(--acc);border:none;border-radius:8px;padding:9px 16px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#0A0A0B;cursor:pointer;letter-spacing:.5px;text-transform:uppercase}
+.dl-btn:active{opacity:.8}
+.data-desc{font-size:13px;color:var(--muted);line-height:1.6}
+.ex-picker{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto}
+.ex-pick-row{background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;padding:12px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .1s}
+.ex-pick-row:active{background:var(--surf3)}
+.ex-pick-name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700}
+.ex-pick-cat{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.chart-wrap{position:relative;width:100%;height:190px;margin-top:12px}
+.chart-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;margin-top:16px}
+
+/* ---- LIBRARY ---- */
+.cat-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.cat-tab{background:var(--surf2);border:1px solid var(--bdr);border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;letter-spacing:.5px;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif}
+.cat-tab.active{background:var(--surf3);border-color:var(--acc);color:var(--acc)}
+.lib-list{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow-y:auto}
+.lib-row{background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center}
+.lib-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700}
+.lib-cat{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.lib-del{background:rgba(255,68,85,0.15);border:1px solid rgba(255,68,85,0.3);border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;color:var(--red);cursor:pointer;letter-spacing:.5px;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif}
+.lib-del:active{opacity:.7}
+.add-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.add-input{background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;padding:12px 14px;font-family:'Barlow',sans-serif;font-size:14px;color:var(--text);outline:none;-webkit-appearance:none}
+.add-input:focus{border-color:var(--acc)}
+.add-input option{background:var(--surf2);color:var(--text)}
+#new-ex-name{flex:1;min-width:0}
+#new-ex-cat{width:120px}
+.add-ex-btn{background:var(--acc);border:none;border-radius:10px;padding:12px 18px;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:#0A0A0B;cursor:pointer}
+.add-ex-btn:active{opacity:.8}
+
+/* ---- TOAST ---- */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--green);color:#0A0A0B;padding:12px 24px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;opacity:0;transition:opacity .25s;pointer-events:none;z-index:999;white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,0.5)}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HOME -->
+<div class="screen active" id="s-home">
+  <div class="top-bar">
+    <div>
+      <div class="brand-sub">Training System</div>
+      <div class="brand">SOURCE<span>·</span>STR</div>
+    </div>
+    <div class="date-lbl" id="home-date"></div>
+  </div>
+  <div class="home-actions">
+    <button class="btn-primary" onclick="generateWorkout()" style="font-size:26px;padding:28px">⚡ Generate Today's Workout</button>
+    <div class="home-row">
+      <button class="btn-ghost" onclick="showScreen('s-data')">📊 Data &amp; Export</button>
+      <button class="btn-ghost" onclick="showScreen('s-library')">✏️ Edit Library</button>
+    </div>
+  </div>
+  <div class="section-lbl">Recent Sessions</div>
+  <div class="session-list" id="sess-list"><div class="empty">No sessions yet.<br>Hit Generate to start.</div></div>
+</div>
+
+<!-- WORKOUT -->
+<div class="screen" id="s-workout">
+  <div class="back-row">
+    <div class="back-btn" onclick="showScreen('s-home')">←</div>
+    <div><div class="back-sub">Today's Program</div><div class="back-title">30-Minute Workout</div></div>
+  </div>
+  <div class="wkt-sections" id="wkt-sections"></div>
+</div>
+
+<!-- LOG -->
+<div class="screen" id="s-log">
+  <div class="log-outer">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div class="back-btn" onclick="showScreen('s-workout')">←</div>
+      <div><div class="back-sub">Log Exercise</div><div class="log-ex-name" id="log-name"></div></div>
+    </div>
+    <div class="log-ex-desc" id="log-desc"></div>
+  </div>
+  <div class="last-banner" id="last-banner" style="display:none">
+    <div>
+      <div class="last-lbl">Last Session</div>
+      <div class="last-val" id="last-val"></div>
+    </div>
+    <div class="last-date" id="last-date"></div>
+  </div>
+  <div class="log-body">
+    <div>
+      <div class="ctrl-lbl">Weight</div>
+      <div class="big-btns">
+        <div class="big-btn" onclick="adjW(-2.5)">−2.5<br><span style="font-size:11px;color:var(--muted)">kg</span></div>
+        <div class="big-btn mid" id="wbtn-last" onclick="useLastW()"></div>
+        <div class="big-btn" onclick="adjW(2.5)">+2.5<br><span style="font-size:11px;color:var(--muted)">kg</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="ctrl-lbl">Reps</div>
+      <div class="big-btns">
+        <div class="big-btn" id="rb8" onclick="selReps(8)">8<br><span style="font-size:11px;color:var(--muted)">reps</span></div>
+        <div class="big-btn" id="rb10" onclick="selReps(10)">10<br><span style="font-size:11px;color:var(--muted)">reps</span></div>
+        <div class="big-btn" id="rb12" onclick="selReps(12)">12<br><span style="font-size:11px;color:var(--muted)">reps</span></div>
+      </div>
+    </div>
+    <div class="cur-display">
+      <div class="disp-item"><div class="disp-val" id="dw">—</div><div class="disp-unit">kg</div></div>
+      <div class="disp-div"></div>
+      <div class="disp-item"><div class="disp-val" id="dr">—</div><div class="disp-unit">reps</div></div>
+    </div>
+    <div id="sets-sec" style="display:none">
+      <div class="ctrl-lbl" id="sets-lbl">Sets Logged</div>
+      <div class="sets-done" id="sets-done"></div>
+    </div>
+    <button class="save-btn" onclick="saveSet()">Save Set ✓</button>
+  </div>
+</div>
+
+<!-- DATA -->
+<div class="screen" id="s-data">
+  <div class="back-row">
+    <div class="back-btn" onclick="showScreen('s-home')">←</div>
+    <div><div class="back-sub">Analytics</div><div class="back-title">Data &amp; Export</div></div>
+  </div>
+  <div class="data-sec">
+    <div class="data-card">
+      <div class="data-card-head">
+        <div class="data-card-title">Export All Data</div>
+        <button class="dl-btn" onclick="exportCSV()">Download CSV</button>
+      </div>
+      <div class="data-desc">All logged sets exported as CSV — date, exercise, weight (kg), reps. Opens in Excel or Numbers.</div>
+    </div>
+    <div class="data-card">
+      <div class="data-card-head"><div class="data-card-title">Exercise History</div></div>
+      <div class="data-desc" style="margin-bottom:12px">Tap any exercise to see weight and reps charted over time.</div>
+      <div class="ex-picker" id="ex-picker"><div class="empty" style="padding:20px 0">No data logged yet.</div></div>
+    </div>
+    <div id="chart-card" style="display:none">
+      <div class="data-card">
+        <div class="data-card-head">
+          <div class="data-card-title" id="chart-ex-name"></div>
+          <div style="font-size:11px;color:var(--muted)" id="chart-count"></div>
+        </div>
+        <div class="chart-label" style="color:var(--blue)">Weight (kg)</div>
+        <div class="chart-wrap"><canvas id="chart-weight" role="img" aria-label="Weight over time for selected exercise">Weight progress chart.</canvas></div>
+        <div class="chart-label" style="color:var(--acc2)">Reps</div>
+        <div class="chart-wrap"><canvas id="chart-reps" role="img" aria-label="Reps over time for selected exercise">Reps over time chart.</canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LIBRARY -->
+<div class="screen" id="s-library">
+  <div class="back-row">
+    <div class="back-btn" onclick="showScreen('s-home')">←</div>
+    <div><div class="back-sub">Customise</div><div class="back-title">Exercise Library</div></div>
+  </div>
+  <div class="data-sec">
+    <div class="data-card">
+      <div class="cat-tabs" id="lib-tabs"></div>
+      <div class="lib-list" id="lib-list"></div>
+      <div class="add-row">
+        <input class="add-input" id="new-ex-name" placeholder="Exercise name..." autocomplete="off" autocorrect="off">
+        <select class="add-input" id="new-ex-cat">
+          <option value="warmup">Warm-up</option>
+          <option value="legs">Legs</option>
+          <option value="push">Push</option>
+          <option value="pull">Pull</option>
+          <option value="accessory">Accessory</option>
+        </select>
+        <button class="add-ex-btn" onclick="addExercise()">+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const DEFAULT_LIB = {
+  warmup:['Cat/Camel','Birddog','Wall Slides','Spiderman Reach','Jefferson Curls','Shark Stretch','Yoga Pike','Lateral Bear Shuffle','Kneeling Sphinx','Hand Walkouts','90/90 Hip Rotations'],
+  legs:['Machine Leg Press','Hack Squat','Sumo Deadlift','Standard Deadlift','Cluster Deadlift','1.5 Cyclist Squats','Goblet Squats','Sissy Squats','Zercher Squat'],
+  push:['Machine Chest Press','Floor Press','Incline Close Grip Bench','Standard Bench Press','Arnold Press','Philly Press','Bradford Press','Bottoms-up KB Press','Power Press Ups','Dumbbell Fly'],
+  pull:['Seated Cable Row','1-Arm Supported Row','Meadows Row','Seesaw Row','Lat Pull Down','1-Arm Cross Body Pull Down'],
+  accessory:['Seated Hamstring Curl','Nordic Curls','Soleus Calf Raise','Copenhagen Side Plank','Lui Raises','Katana Raises','Rear Delt Fly','Zottman Curls','Skull Crushers','Deadbug MB Pass','Stir the Pot','Window Wipers','Pallof March','Hollow Rock','Zombie Crunches','Ab Rollout','Farmers Walk','KB Swings']
+};
+const MODIFIERS = ['3/1/3 Tempo','1.5 Reps','Cluster Sets','Bottom Pauses'];
+const MOD_DESC = {
+  '3/1/3 Tempo':'3 seconds lowering, 1 second pause, 3 seconds lifting — control every inch of the range.',
+  '1.5 Reps':'1 full rep + 1 half rep at the bottom position. Doubles time under tension at the hardest point.',
+  'Cluster Sets':'10–15 seconds rest between individual reps within a set. Allows heavier loads with full intent on every rep.',
+  'Bottom Pauses':'2-second hold at the most difficult point of each rep. Eliminates stretch reflex and builds true strength.'
+};
+const EX_DESC = {
+  'Cat/Camel':'Segmental spinal flexion and extension on hands and knees to mobilise each vertebral segment.',
+  'Birddog':'Contralateral arm/leg extension from quadruped. Builds anti-rotation stability in the lumbar spine.',
+  'Wall Slides':'Arms slide up a wall to open the thoracic spine and train scapular upward rotation.',
+  'Spiderman Reach':'Lunge with thoracic rotation reach to simultaneously open the hip flexor and t-spine.',
+  'Jefferson Curls':'Slow loaded spinal flexion from standing to mobilise the posterior chain under control.',
+  'Shark Stretch':'Hip flexor mobility drill from a half-kneeling position combined with lateral rotation.',
+  'Yoga Pike':'Downward dog to plank transitions for hamstring length and anterior shoulder loading.',
+  'Lateral Bear Shuffle':'Quadruped lateral shuffle to activate hip abductors and challenge core stability.',
+  'Kneeling Sphinx':'Prone hip flexor stretch progressing to active spinal extension to open the anterior chain.',
+  'Hand Walkouts':'Standing to plank walk-outs for shoulder stability and anterior core activation.',
+  '90/90 Hip Rotations':'Seated hip internal and external rotation to mobilise the hip capsule in both directions.',
+  'Machine Leg Press':'Bilateral leg press through full range on a sled machine. Set feet shoulder-width for balanced quad and glute recruitment.',
+  'Hack Squat':'Fixed sled squat with upright torso providing heavy quad-dominant loading with reduced lower back stress.',
+  'Sumo Deadlift':'Wide-stance hip hinge pulling from the floor. Shifts emphasis to inner quads and adductors versus conventional.',
+  'Standard Deadlift':'Hip hinge pulling a barbell from the floor with full posterior chain engagement. The foundational strength movement.',
+  'Cluster Deadlift':'Deadlift variation with the bar returned to the floor and a brief reset between each rep. Allows maximal intent on every pull.',
+  '1.5 Cyclist Squats':'Heels-elevated goblet squat performed as a full rep plus a half rep at the bottom — creates extreme quad pump.',
+  'Goblet Squats':'Front-loaded squat holding a dumbbell or kettlebell at chest height. Naturally cues upright torso and full depth.',
+  'Sissy Squats':'Knee-dominant squat with heels raised and torso inclined. Directly isolates the rectus femoris under stretch.',
+  'Zercher Squat':'Bar or kettlebell held in the crook of the elbows. Demands a very upright torso and strong anterior core bracing.',
+  'Machine Chest Press':'Horizontal push on a plate-loaded or cable chest press machine. Consistent path allows focus on full range.',
+  'Floor Press':'Dumbbell or barbell press lying flat on the floor. Eliminates shoulder extension past neutral and reduces pec stretch stress.',
+  'Incline Close Grip Bench':'Incline bench with a narrow grip targeting the upper chest and long head of the triceps simultaneously.',
+  'Standard Bench Press':'Horizontal barbell press. The foundational horizontal pushing pattern targeting the pectoral complex.',
+  'Arnold Press':'Rotating dumbbell press moving from a neutral grip to fully pronated overhead. Full deltoid activation through range.',
+  'Philly Press':'Kneeling dumbbell press with a slight forward lean emphasising the anterior deltoid and demanding core stability.',
+  'Bradford Press':'Barbell cycled front to back over the head in an arc. Continuous deltoid tension across the full shoulder complex.',
+  'Bottoms-up KB Press':'Kettlebell pressed upside down. Demands extreme grip strength, wrist stability, and rotator cuff co-contraction.',
+  'Power Press Ups':'Explosive push-up with hands leaving the ground at the top. Develops horizontal pressing power and coordination.',
+  'Dumbbell Fly':'Chest isolation fly with slight elbow bend throughout. Emphasises the pectoral stretch at the bottom of each rep.',
+  'Seated Cable Row':'Horizontal cable pull targeting mid-back, rhomboids, and lower traps. Maintain an upright torso throughout.',
+  '1-Arm Supported Row':'Single-arm dumbbell row with the chest supported on an incline bench. Eliminates lower back compensation entirely.',
+  'Meadows Row':'Landmine-style single-arm row from a staggered stance. Allows a very strong stretch of the lat at the bottom.',
+  'Seesaw Row':'Alternating cable or dumbbell rows for anti-rotation core demand and full unilateral range of motion.',
+  'Lat Pull Down':'Vertical cable pull to the chest targeting the latissimus dorsi. Pull the elbows down and back rather than the bar.',
+  '1-Arm Cross Body Pull Down':'Single-arm cable pull-down across the midline of the body. Emphasises the lower lat fibres through a full arc.',
+  'Seated Hamstring Curl':'Isolated knee flexion on a seated curl machine. Trains hamstrings with the hip in slight flexion for more complete activation.',
+  'Nordic Curls':'Bodyweight eccentric hamstring exercise. Anchor the feet, lower under full control. One of the most effective hamstring builders.',
+  'Soleus Calf Raise':'Seated calf raise with the knee bent at 90 degrees. Specifically isolates the soleus rather than the gastrocnemius.',
+  'Copenhagen Side Plank':'Side plank with the top leg elevated on a bench. The primary Copenhagen plank variant for adductor loading and hip stability.',
+  'Lui Raises':'Lateral raise variation with a slight forward lean and thumb-down rotation for better supraspinatus recruitment.',
+  'Katana Raises':'Diagonal cable or band raise pattern mimicking drawing a sword. Directly targets the anterior deltoid through a long arc.',
+  'Rear Delt Fly':'Hinged or prone fly targeting the posterior deltoid. Use a wide arc and keep the elbows slightly bent throughout.',
+  'Zottman Curls':'Supinated (palms up) curl on the way up, pronated (palms down) on the way down. Trains both heads and the brachioradialis.',
+  'Skull Crushers':'Lying tricep extension lowering a bar or dumbbells toward the forehead. Emphasises the long head of the triceps under stretch.',
+  'Deadbug MB Pass':'Supine dead bug pattern with a medicine ball passed from hands to feet. Demands full anterior core bracing throughout.',
+  'Stir the Pot':'Forearms on a Swiss ball in a plank position, drawing circles. High anti-extension and anti-rotation demand simultaneously.',
+  'Window Wipers':'Hanging or floor-based leg rotation to either side targeting the obliques and hip flexors through a full arc.',
+  'Pallof March':'Anti-rotation Pallof press combined with alternating high-knee marches. Challenges core stability during dynamic movement.',
+  'Hollow Rock':'Supine hollow body position rocked back and forth. The foundational gymnastic anterior core exercise.',
+  'Zombie Crunches':'Slow crunch with arms extended forward, maximising the working range of the rectus abdominis.',
+  'Ab Rollout':'Ab wheel or barbell rollout. One of the most demanding long-lever anterior core exercises available.',
+  'Farmers Walk':'Heavy loaded carry with dumbbells or kettlebells. Builds grip strength, core stability, and serious work capacity.',
+  'KB Swings':'Hip hinge-powered kettlebell swing. Trains posterior chain power and cardiovascular conditioning simultaneously.'
+};
+const CAT_LABELS = {warmup:'Warm-up',legs:'Legs',push:'Push',pull:'Pull',accessory:'Accessory'};
+const PRIMARY_CATS = ['legs','push','pull'];
+
+let db, lib={}, currentWorkout={}, curEx=null, curW=0, curR=0, sessionSets=[], lastWVal=null, lastWDate=null;
+let activeLibCat='legs', wChart=null, rChart=null;
+
+function loadLib(){
+  const s=localStorage.getItem('ss_lib_v2');
+  lib=s?JSON.parse(s):JSON.parse(JSON.stringify(DEFAULT_LIB));
+}
+function saveLib(){localStorage.setItem('ss_lib_v2',JSON.stringify(lib));}
+
+function pick(arr,n){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,n);}
+function rand(arr){return arr[Math.floor(Math.random()*arr.length)];}
+
+function initDB(){
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open('SourceStrengthV3',1);
+    r.onupgradeneeded=e=>{
+      const d=e.target.result;
+      if(!d.objectStoreNames.contains('sets')){
+        const s=d.createObjectStore('sets',{keyPath:'id',autoIncrement:true});
+        s.createIndex('exercise','exercise',{unique:false});
+        s.createIndex('date','date',{unique:false});
+      }
+    };
+    r.onsuccess=e=>{db=e.target.result;res();};
+    r.onerror=rej;
+  });
+}
+function dbAll(){
+  return new Promise((res,rej)=>{
+    const r=db.transaction('sets').objectStore('sets').getAll();
+    r.onsuccess=e=>res(e.target.result);
+    r.onerror=rej;
+  });
+}
+function dbAdd(data){
+  return new Promise((res,rej)=>{
+    const t=db.transaction('sets','readwrite');
+    t.objectStore('sets').add(data).onsuccess=()=>res();
+    t.onerror=rej;
+  });
+}
+
+async function loadSessions(){
+  const sets=await dbAll();
+  const byDate={};
+  sets.forEach(s=>{
+    const d=s.date.split('T')[0];
+    if(!byDate[d])byDate[d]={date:d,exercise:s.exercise,maxWeight:s.weight};
+    else if(s.weight>byDate[d].maxWeight){byDate[d].exercise=s.exercise;byDate[d].maxWeight=s.weight;}
+  });
+  const sorted=Object.values(byDate).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+  const el=document.getElementById('sess-list');
+  if(!sorted.length){
+    el.innerHTML='<div class="empty">No sessions yet.<br>Hit Generate to start.</div>';
+    return;
+  }
+  el.innerHTML=sorted.map(s=>`<div class="sess-card" onclick="openHistoryFromHome('${esc(s.exercise)}')">
+    <div>
+      <div class="sess-date">${new Date(s.date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</div>
+      <div class="sess-ex">${s.exercise}</div>
+    </div>
+    <div class="sess-wt">${s.maxWeight}kg</div>
+  </div>`).join('');
+}
+
+function esc(s){return s.replace(/'/g,"\\'");}
+
+function openHistoryFromHome(ex){
+  showScreen('s-data');
+  loadDataScreen().then(()=>showExChart(ex));
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='s-data')loadDataScreen();
+  if(id==='s-library')renderLibrary();
+}
+
+function setDate(){
+  const d=new Date();
+  document.getElementById('home-date').innerHTML=
+    d.toLocaleDateString('en-GB',{weekday:'long'})+'<br>'+
+    d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+}
+
+function generateWorkout(){
+  const wu=pick(lib.warmup,3);
+  const primaryCat=rand(PRIMARY_CATS);
+  const primary=rand(lib[primaryCat]);
+  const modifier=rand(MODIFIERS);
+  const acc=pick(lib.accessory,2);
+  currentWorkout={wu,primary,primaryCat,modifier,acc,logged:new Set()};
+  renderWorkout();
+  showScreen('s-workout');
+}
+
+function renderWorkout(){
+  const {wu,primary,primaryCat,modifier,acc,logged}=currentWorkout;
+  document.getElementById('wkt-sections').innerHTML=`
+    <div class="wkt-sec sec-wu">
+      <div class="wkt-sec-head">
+        <span class="wkt-sec-name">Warm-Up</span>
+        <span class="wkt-sec-time">5 min · assume complete</span>
+      </div>
+      ${wu.map((e,i)=>`<div class="ex-row">
+        <div class="ex-left" onclick="openLog('${esc(e)}')">
+          <div class="ex-name">${e}</div>
+          ${logged.has(e)?'<div class="ex-done">✓ noted</div>':''}
+        </div>
+        <div class="ex-actions">
+          <div class="swap-btn" onclick="swapEx('warmup',${i})">Swap</div>
+        </div>
+      </div>`).join('')}
+    </div>
+    <div class="wkt-sec sec-pr">
+      <div class="wkt-sec-head">
+        <span class="wkt-sec-name">Primary Lift</span>
+        <span class="wkt-sec-time">15 min</span>
+      </div>
+      <div class="mod-badge">⚡ ${modifier}</div>
+      <div class="mod-desc">${MOD_DESC[modifier]}</div>
+      <div style="border-top:1px solid var(--bdr)">
+        <div class="ex-row">
+          <div class="ex-left" onclick="openLog('${esc(primary)}')">
+            <div class="ex-name">${primary}</div>
+            ${logged.has(primary)?'<div class="ex-done">✓ done</div>':''}
+          </div>
+          <div class="ex-actions">
+            <div class="swap-btn" onclick="swapEx('${primaryCat}',0,'primary')">Swap</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wkt-sec sec-ac">
+      <div class="wkt-sec-head">
+        <span class="wkt-sec-name">Accessories</span>
+        <span class="wkt-sec-time">10 min</span>
+      </div>
+      ${acc.map((e,i)=>`<div class="ex-row">
+        <div class="ex-left" onclick="openLog('${esc(e)}')">
+          <div class="ex-name">${e}</div>
+          ${logged.has(e)?'<div class="ex-done">✓ done</div>':''}
+        </div>
+        <div class="ex-actions">
+          <div class="swap-btn" onclick="swapEx('accessory',${i})">Swap</div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+}
+
+function swapEx(cat,idx,role){
+  if(role==='primary'){
+    const pool=lib[cat].filter(e=>e!==currentWorkout.primary);
+    if(!pool.length){showToast('No alternatives in this category');return;}
+    currentWorkout.primary=rand(pool);
+  } else if(cat==='warmup'){
+    const pool=lib.warmup.filter(e=>!currentWorkout.wu.includes(e));
+    if(!pool.length){showToast('No more warm-ups to swap in');return;}
+    currentWorkout.wu[idx]=rand(pool);
+  } else {
+    const pool=lib.accessory.filter(e=>!currentWorkout.acc.includes(e)&&e!==currentWorkout.acc[idx]);
+    if(!pool.length){showToast('No more accessories to swap in');return;}
+    currentWorkout.acc[idx]=rand(pool);
+  }
+  renderWorkout();
+}
+
+async function openLog(ex){
+  curEx=ex;sessionSets=[];curR=0;
+  const sets=await dbAll();
+  const exSets=sets.filter(s=>s.exercise===ex).sort((a,b)=>b.date.localeCompare(a.date));
+  if(exSets.length){
+    lastWVal=exSets[0].weight;
+    lastWDate=new Date(exSets[0].date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    curW=lastWVal;
+  } else {
+    lastWVal=null;lastWDate=null;curW=60;
+  }
+  document.getElementById('log-name').textContent=ex;
+  document.getElementById('log-desc').textContent=EX_DESC[ex]||'';
+  const banner=document.getElementById('last-banner');
+  if(lastWVal){
+    banner.style.display='flex';
+    document.getElementById('last-val').textContent=`${lastWVal}kg × ${exSets[0].reps} reps`;
+    document.getElementById('last-date').textContent=lastWDate;
+  } else {
+    banner.style.display='none';
+  }
+  const lb=document.getElementById('wbtn-last');
+  lb.innerHTML=lastWVal
+    ?`Last<br><span style="font-size:14px;color:var(--blue);font-weight:900">${lastWVal}kg</span>`
+    :`No history<br><span style="font-size:11px;color:var(--muted)">—</span>`;
+  updateDisp();
+  ['rb8','rb10','rb12'].forEach(id=>document.getElementById(id).classList.remove('sel'));
+  document.getElementById('dr').textContent='—';
+  document.getElementById('sets-sec').style.display='none';
+  document.getElementById('sets-done').innerHTML='';
+  showScreen('s-log');
+}
+
+function adjW(d){
+  curW=Math.max(0,Math.round((curW+d)*10)/10);
+  updateDisp();
+}
+function useLastW(){
+  if(lastWVal){curW=lastWVal;updateDisp();}
+}
+function selReps(n){
+  curR=n;
+  ['rb8','rb10','rb12'].forEach(id=>document.getElementById(id).classList.remove('sel'));
+  document.getElementById('rb'+n).classList.add('sel');
+  document.getElementById('dr').textContent=n;
+}
+function updateDisp(){
+  document.getElementById('dw').textContent=curW%1===0?curW:curW.toFixed(1);
+}
+
+async function saveSet(){
+  if(!curR){showToast('Select reps first');return;}
+  const set={exercise:curEx,weight:curW,reps:curR,date:new Date().toISOString()};
+  await dbAdd(set);
+  sessionSets.push(set);
+  if(currentWorkout.logged)currentWorkout.logged.add(curEx);
+  const sec=document.getElementById('sets-sec');
+  sec.style.display='block';
+  document.getElementById('sets-lbl').textContent=`Sets Logged (${sessionSets.length})`;
+  document.getElementById('sets-done').innerHTML=sessionSets.map((s,i)=>
+    `<div class="set-row"><span class="set-num">Set ${i+1}</span><span class="set-data">${s.weight}kg × ${s.reps}</span></div>`
+  ).join('');
+  showToast('Set saved!');
+  loadSessions();
+}
+
+async function loadDataScreen(){
+  const sets=await dbAll();
+  const exMap={};
+  sets.forEach(s=>{if(!exMap[s.exercise])exMap[s.exercise]=0;exMap[s.exercise]++;});
+  const sorted=Object.entries(exMap).sort((a,b)=>b[1]-a[1]);
+  const picker=document.getElementById('ex-picker');
+  if(!sorted.length){picker.innerHTML='<div class="empty" style="padding:20px 0">No data logged yet.</div>';return;}
+  picker.innerHTML=sorted.map(([ex,count])=>`<div class="ex-pick-row" onclick="showExChart('${esc(ex)}')">
+    <div>
+      <div class="ex-pick-name">${ex}</div>
+      <div class="ex-pick-cat">${count} set${count!==1?'s':''}</div>
+    </div>
+    <div style="font-size:16px;color:var(--muted)">›</div>
+  </div>`).join('');
+}
+
+async function showExChart(ex){
+  const sets=await dbAll();
+  const exSets=sets.filter(s=>s.exercise===ex).sort((a,b)=>a.date.localeCompare(b.date));
+  if(!exSets.length){showToast('No data for '+ex);return;}
+  document.getElementById('chart-card').style.display='block';
+  document.getElementById('chart-ex-name').textContent=ex;
+  document.getElementById('chart-count').textContent=`${exSets.length} set${exSets.length!==1?'s':''}`;
+  const labels=exSets.map(s=>new Date(s.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}));
+  const weights=exSets.map(s=>s.weight);
+  const reps=exSets.map(s=>s.reps);
+  const baseCfg={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
+    x:{ticks:{color:'#777',font:{size:10},maxRotation:45},grid:{color:'rgba(255,255,255,0.05)'}},
+    y:{ticks:{color:'#777',font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'}}
+  }};
+  if(wChart)wChart.destroy();
+  if(rChart)rChart.destroy();
+  wChart=new Chart(document.getElementById('chart-weight'),{
+    type:'line',
+    data:{labels,datasets:[{data:weights,borderColor:'#60B8FF',backgroundColor:'rgba(96,184,255,0.08)',tension:0.3,pointRadius:5,pointBackgroundColor:'#60B8FF',fill:true,borderWidth:2}]},
+    options:baseCfg
+  });
+  rChart=new Chart(document.getElementById('chart-reps'),{
+    type:'line',
+    data:{labels,datasets:[{data:reps,borderColor:'#FF6B35',backgroundColor:'rgba(255,107,53,0.08)',tension:0.3,pointRadius:5,pointBackgroundColor:'#FF6B35',fill:true,borderWidth:2}]},
+    options:baseCfg
+  });
+  document.getElementById('chart-card').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+async function exportCSV(){
+  const sets=await dbAll();
+  if(!sets.length){showToast('No data to export');return;}
+  const rows=['Date,Exercise,Weight (kg),Reps'];
+  sets.sort((a,b)=>a.date.localeCompare(b.date)).forEach(s=>{
+    const d=new Date(s.date).toLocaleDateString('en-GB');
+    rows.push(`${d},"${s.exercise}",${s.weight},${s.reps}`);
+  });
+  const blob=new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='source-strength-data.csv';
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('CSV Downloaded!');
+}
+
+function renderLibrary(){
+  const tabs=document.getElementById('lib-tabs');
+  tabs.innerHTML=Object.keys(lib).map(cat=>
+    `<div class="cat-tab${cat===activeLibCat?' active':''}" onclick="setLibCat('${cat}')">${CAT_LABELS[cat]}</div>`
+  ).join('');
+  const list=document.getElementById('lib-list');
+  const exercises=lib[activeLibCat];
+  if(!exercises.length){list.innerHTML='<div class="empty" style="padding:20px 0">No exercises. Add one below.</div>';return;}
+  list.innerHTML=exercises.map((ex,i)=>`<div class="lib-row">
+    <div>
+      <div class="lib-name">${ex}</div>
+      <div class="lib-cat">${CAT_LABELS[activeLibCat]}</div>
+    </div>
+    <button class="lib-del" onclick="deleteExercise('${activeLibCat}',${i})">Remove</button>
+  </div>`).join('');
+}
+
+function setLibCat(cat){activeLibCat=cat;renderLibrary();}
+
+function addExercise(){
+  const name=document.getElementById('new-ex-name').value.trim();
+  const cat=document.getElementById('new-ex-cat').value;
+  if(!name){showToast('Enter a name first');return;}
+  if(lib[cat].map(e=>e.toLowerCase()).includes(name.toLowerCase())){showToast('Already in library');return;}
+  lib[cat].push(name);
+  saveLib();
+  document.getElementById('new-ex-name').value='';
+  activeLibCat=cat;
+  renderLibrary();
+  showToast('Added to '+CAT_LABELS[cat]);
+}
+
+function deleteExercise(cat,idx){
+  if(lib[cat].length<=1){showToast('Need at least 1 exercise per category');return;}
+  const name=lib[cat][idx];
+  lib[cat].splice(idx,1);
+  saveLib();
+  renderLibrary();
+  showToast(name+' removed');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+(async()=>{
+  loadLib();
+  await initDB();
+  setDate();
+  loadSessions();
+})();
+</script>
+</body>
+</html>
